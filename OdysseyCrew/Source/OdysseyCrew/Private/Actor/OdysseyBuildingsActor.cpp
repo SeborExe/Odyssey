@@ -12,7 +12,7 @@ AOdysseyBuildingsActor::AOdysseyBuildingsActor()
     Flats = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("Flats"));
     RootComponent = Flats;
  
-    // Domyslny szescian silnika: 100x100x100 uu, pivot w srodku.
+    // Domyslny szescian silnika
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
     if (CubeMesh.Succeeded())
     {
@@ -21,7 +21,7 @@ AOdysseyBuildingsActor::AOdysseyBuildingsActor()
  
     Flats->NumCustomDataFloats = 4; // R, G, B, Highlight
  
-    // Kolizja tylko do trace'a (klikanie), bez fizyki.
+    // Kolizja tylko do trace'a, bez fizyki.
     Flats->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     Flats->SetCollisionResponseToAllChannels(ECR_Block);
     Flats->SetMobility(EComponentMobility::Movable);
@@ -30,7 +30,6 @@ AOdysseyBuildingsActor::AOdysseyBuildingsActor()
 void AOdysseyBuildingsActor::BeginPlay()
 {
     Super::BeginPlay();
- 
     if (FlatMaterial)
     {
         Flats->SetMaterial(0, FlatMaterial);
@@ -58,14 +57,12 @@ void AOdysseyBuildingsActor::Rebuild()
  
     const TArray<FOdysseyBuilding> Buildings = DB->GetBuildings(InvestmentId);
  
-    // Budynki obok siebie wzdluz X (wyrownane do lewej).
+    // Budynki obok siebie wzdluz X
     float BuildingOriginX = 0.f;
     for (const FOdysseyBuilding& B : Buildings)
     {
         const TArray<FOdysseyFlat> BuildingFlats = DB->GetFlats(B.Id);
- 
-        // Grupowanie po kondygnacji wejscia; klucze posortowane rosnaco,
-        // bo duplexy rezerwuja kolumne na piEtrze WYZEJ (przetwarzamy od dolu).
+        
         TMap<int32, TArray<const FOdysseyFlat*>> ByFloor;
         for (const FOdysseyFlat& F : BuildingFlats)
         {
@@ -75,8 +72,7 @@ void AOdysseyBuildingsActor::Rebuild()
         TArray<int32> FloorKeys;
         ByFloor.GetKeys(FloorKeys);
         FloorKeys.Sort();
- 
-        // floor -> zajete przedzialy X (od duplexow z kondygnacji nizej).
+        
         TMap<int32, TArray<TPair<float, float>>> Reserved;
         float BuildingWidth = 0.f;
  
@@ -96,8 +92,6 @@ void AOdysseyBuildingsActor::Rebuild()
             for (const FOdysseyFlat* F : ByFloor[FloorNo])
             {
                 const float W = ComputeFlatWidth(F->Area);
- 
-                // Omin kolumny zajete przez duplexy z kondygnacji nizej.
                 if (Res)
                 {
                     for (const TPair<float, float>& R : *Res)
@@ -110,31 +104,30 @@ void AOdysseyBuildingsActor::Rebuild()
                     }
                 }
  
-                const float H = StoreyHeight * FMath::Max(1, F->FloorSpan()); // duplex = 2 kondygnacje
+                const float H = StoreyHeight * FMath::Max(1, F->FloorSpan());
  
                 const float CenterX = CursorX + W * 0.5f;
                 const float CenterZ = FloorNo * StoreyHeight + H * 0.5f;
  
                 FTransform T;
                 T.SetLocation(FVector(CenterX, 0.f, CenterZ));
-                T.SetScale3D(FVector(W / 100.f, FlatDepth / 100.f, H / 100.f)); // szescian bazowy = 100 uu
+                T.SetScale3D(FVector(W / 100.f, FlatDepth / 100.f, H / 100.f));
  
                 const int32 Idx = Flats->AddInstance(T);
-                InstanceFlats.Add(*F); // kopia; index zgodny z ISM
- 
-                // Duplex rezerwuje swoja kolumne na piEtrze wyzej.
+                InstanceFlats.Add(*F);
+                
                 if (F->IsDuplex())
                 {
                     Reserved.FindOrAdd(FloorNo + 1).Add(TPair<float, float>(CursorX, CursorX + W));
                 }
- 
-                // Kolor statusu (linear) -> custom data. Highlight = 0.
+                
                 FLinearColor C = FLinearColor::Gray;
                 FOdysseyFlatStatus St;
                 if (DB->GetStatus(F->StatusId, St))
                 {
                     C = St.GetLinearColor();
                 }
+                
                 Flats->SetCustomDataValue(Idx, 0, C.R);
                 Flats->SetCustomDataValue(Idx, 1, C.G);
                 Flats->SetCustomDataValue(Idx, 2, C.B);
@@ -163,8 +156,7 @@ bool AOdysseyBuildingsActor::GetBuildingCenter(int32 BuildingIndex, FVector& Out
     if (!BuildingLocalBounds.IsValidIndex(BuildingIndex))
         return false;
 
-    OutWorldCenter = Flats->GetComponentTransform()
-        .TransformPosition(BuildingLocalBounds[BuildingIndex].GetCenter());
+    OutWorldCenter = Flats->GetComponentTransform().TransformPosition(BuildingLocalBounds[BuildingIndex].GetCenter());
     return true;
 }
 

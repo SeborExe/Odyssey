@@ -14,13 +14,4 @@ class ODYSSEYCREW_API AOdysseyPawn : public APawn
 public:
 
 	AOdysseyPawn();
-
-protected:
-
-	virtual void BeginPlay() override;
-
-public:	
-	
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 };

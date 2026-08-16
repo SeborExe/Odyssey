@@ -7,7 +7,6 @@
 void UOdysseyChangeBuildingWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
 	if (ChangeBuildingButton && ChangeBuildingButton->OnClicked.IsAlreadyBound(this, &UOdysseyChangeBuildingWidget::NativeConstruct) == false)
 	{
 		ChangeBuildingButton->OnClicked.AddDynamic(this, &ThisClass::OnButtonClicked_Callback);

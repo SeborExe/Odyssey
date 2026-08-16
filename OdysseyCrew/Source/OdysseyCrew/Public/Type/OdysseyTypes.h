@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "OdysseyTypes.generated.h"
 
-// Inwestycja (osiedle) — tylko aktywne trafiają do prezentacji.
+// Inwestycja (osiedle) — tylko aktywne trafiają do prezentacji
 USTRUCT(BlueprintType)
 struct FOdysseyInvestment
 {
@@ -22,10 +22,10 @@ struct FOdysseyInvestment
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     FName Description;
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    FName Currency; // zwykle "PLN"
+    FName Currency; // zakładam "PLN"
 };
  
-// Budynek wewnątrz inwestycji.
+// Budynek wewnątrz inwestycji
 USTRUCT(BlueprintType)
 struct FOdysseyBuilding
 {
@@ -40,12 +40,12 @@ struct FOdysseyBuilding
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     FName Code;         // "A"
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    int32   FloorsCount = 0; // kondygnacje 0 .. FloorsCount-1
+    int32   FloorsCount = 0;
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    int32   OrderNumber = 0; // kolejnosc prezentacji
+    int32   OrderNumber = 0;
 };
  
-// Slownik statusow sprzedazy (available / reserved / sold).
+// Slownik statusow sprzedazy (available / reserved / sold)
 USTRUCT(BlueprintType)
 struct FOdysseyFlatStatus
 {
@@ -56,19 +56,16 @@ struct FOdysseyFlatStatus
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     FName Code;     // "available" | "reserved" | "sold"
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    FName Label;    // label_pl, np. "Wolne"
+    FName Label;  
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    FString ColorHex; // np. "#4CAF50"
- 
-    // Kolor gotowy do materialu/UI. Hex jest w przestrzeni sRGB,
-    // wiec konwertujemy poprawnie do liniowej.
+    FString ColorHex;
+    
     FLinearColor GetLinearColor() const
     {
         return FLinearColor::FromSRGBColor(FColor::FromHex(ColorHex));
     }
 };
- 
-// Dodatek (balkon, ogrodek, komorka...) z opcjonalnym opisem per mieszkanie.
+
 USTRUCT(BlueprintType)
 struct FOdysseyExtra
 {
@@ -77,12 +74,12 @@ struct FOdysseyExtra
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     int32 Id{0};
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    FName Name; // "Balkon"
+    FName Name;
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    FName Note; // "Balkon 6.2 m2" lub puste
+    FName Note;
 };
  
-// Mieszkanie — juz przefiltrowane (widoczne) i z rozwiazanymi NULL-ami.
+// Mieszkanie — juz przefiltrowane (widoczne) i z rozwiazanymi NULL-ami
 USTRUCT(BlueprintType)
 struct FOdysseyFlat
 {
@@ -97,25 +94,23 @@ struct FOdysseyFlat
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     FName Name;        // "A.3.2"
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    int32 EntryFloor = 0; // kondygnacja wejscia
+    int32 EntryFloor = 0;
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    int32 Floor = 0;      // najwyzsza zajmowana kondygnacja
+    int32 Floor = 0;
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     int32 NumRooms = 0;
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
-    float Area = 0.f;     // m2
+    float Area = 0.f;     // m^2
  
-    // Ceny trzymane w bazie w GROSZACH. NULL = brak ceny do publicznej prezentacji.
-    // Rozrozniamy "brak ceny" od "cena = 0" flaga bHasPrice.
+    // Ceny trzymane w bazie w GROSZACH. NULL = brak ceny do publicznej prezentacji
+    // Rozrozniamy "brak ceny" od "cena = 0" -> flaga bHasPrice
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     bool bHasPrice = false;
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     int64 PriceGrosze = 0;
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     int64 PriceSqmGrosze = 0;
- 
-    // mesh_id moze byc NULL (lokal bez reprezentacji 3D). W tym zadaniu
-    // geometrie generujemy z danych, wiec to pole jest w zasadzie informacyjne.
+    
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     bool bHasMesh = false;
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
@@ -126,11 +121,11 @@ struct FOdysseyFlat
     UPROPERTY(BlueprintReadOnly, Category = "Odyssey") 
     TArray<FOdysseyExtra> Extras;
  
-    // Dwupoziomowe: Floor == EntryFloor + 1. Box ma wtedy podwojna wysokosc.
+    // Dwupoziomowe: Floor == EntryFloor + 1. Box ma wtedy podwojna wysokosc
     bool  IsDuplex()  const { return Floor > EntryFloor; }
     int32 FloorSpan() const { return Floor - EntryFloor + 1; }
  
-    // Ceny w zlotych (do formatowania w warstwie prezentacji).
+    // Ceny w zlotych
     double PriceZl()    const { return PriceGrosze    / 100.0; }
     double PriceSqmZl() const { return PriceSqmGrosze / 100.0; }
 };

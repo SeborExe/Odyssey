@@ -2,8 +2,10 @@
 
 #include "Core/OdysseyPlayerController.h"
 
+#include "EnhancedInputComponent.h"
 #include "Actor/OdysseyBuildingsActor.h"
-#include "Kismet/GameplayStatics.h"
+#include "Engine/AssetManager.h"
+#include "Engine/StreamableManager.h"
 #include "Widget/OdysseyChangeBuildingWidget.h"
 #include "Widget/OdysseyFlatDetailsWidget.h"
 #include "Widget/OdysseyHUD.h"
@@ -18,15 +20,8 @@ void AOdysseyPlayerController::BeginPlay()
 	bShowMouseCursor   = true;
 	bEnableClickEvents = true;
 	bEnableTouchEvents = true;
- 
-	// Aktor z bryłami (na scenie jest jeden).
-	Buildings = Cast<AOdysseyBuildingsActor>(
-		UGameplayStatics::GetActorOfClass(this, AOdysseyBuildingsActor::StaticClass()));
- 
-	if (Buildings)
-	{
-		Buildings->OnFlatSelected.AddDynamic(this, &AOdysseyPlayerController::HandleFlatSelected);
-	}
+	
+	LoadBuildings();
 }
 
 void AOdysseyPlayerController::Tick(float DeltaTime)
@@ -51,14 +46,18 @@ void AOdysseyPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	
-	// Klasyczny binding dziala bez zakladania Enhanced Input assetow.
-	InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this,
-		&AOdysseyPlayerController::HandlePrimaryPress);
-	InputComponent->BindTouch(IE_Pressed, this,
-		&AOdysseyPlayerController::HandleTouchPress);
+	if (UEnhancedInputComponent* EIC = CastChecked<UEnhancedInputComponent>(InputComponent))
+	{
+		if (IA_PrimaryPress)
+		{
+			EIC->BindAction(IA_PrimaryPress, ETriggerEvent::Completed, this, &ThisClass::HandlePrimaryPress);
+		}
+	}
+	
+	InputComponent->BindTouch(IE_Pressed, this, &AOdysseyPlayerController::HandleTouchPress);
 }
 
-void AOdysseyPlayerController::HandlePrimaryPress()
+void AOdysseyPlayerController::HandlePrimaryPress(const FInputActionValue& Value)
 {
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
@@ -87,7 +86,7 @@ void AOdysseyPlayerController::TrySelectFromHit(const FHitResult& Hit)
 	{
 		if (Hitted->SelectByInstanceIndex(Hit.Item))
 		{
-			return; // panel pokaze HandleFlatSelected
+			return;
 		}
 	}
  
@@ -220,5 +219,41 @@ void AOdysseyPlayerController::HandleChangeBuilding(bool bNext)
 	else
 	{
 		GetOdysseyChangeBuildingWidgetNext()->SetIsEnabled(true);
+	}
+}
+
+void AOdysseyPlayerController::LoadBuildings()
+{
+	if (Buildings.IsNull())
+	{
+		return;
+	}
+	
+	if (AOdysseyBuildingsActor* Loaded = Buildings.Get())
+	{
+		BindToBuildings(Loaded);
+		return;
+	}
+
+	FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
+	Streamable.RequestAsyncLoad(
+		Buildings.ToSoftObjectPath(),
+		FStreamableDelegate::CreateUObject(this, &AOdysseyPlayerController::OnBuildingsLoaded)
+	);
+}
+
+void AOdysseyPlayerController::OnBuildingsLoaded()
+{
+	if (AOdysseyBuildingsActor* Loaded = Buildings.Get())
+	{
+		BindToBuildings(Loaded);
+	}
+}
+
+void AOdysseyPlayerController::BindToBuildings(AOdysseyBuildingsActor* Loaded)
+{
+	if (!Loaded->OnFlatSelected.IsAlreadyBound(this, &AOdysseyPlayerController::HandleFlatSelected))
+	{
+		Loaded->OnFlatSelected.AddDynamic(this, &AOdysseyPlayerController::HandleFlatSelected);
 	}
 }

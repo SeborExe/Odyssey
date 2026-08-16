@@ -17,7 +17,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
  
-	/** Otwiera baze w trybie READ-ONLY. false = plik nie istnieje / blad. */
+	//Otwiera baze w trybie READ-ONLY. false = plik nie istnieje
 	UFUNCTION(BlueprintCallable, Category = "Odyssey|DB")
 	bool OpenDatabase(const FString& AbsolutePath);
 	
@@ -27,11 +27,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Odyssey|DB")
 	bool IsOpen() const;
  
-	/** Tylko aktywne inwestycje. */
+	// Tylko aktywne inwestycje
 	UFUNCTION(BlueprintCallable, Category = "Odyssey|DB")
 	TArray<FOdysseyInvestment> GetInvestments();
  
-	/** Aktywne budynki aktywnej inwestycji, wg order_number. */
+	// Aktywne budynki aktywnej inwestycji
 	UFUNCTION(BlueprintCallable, Category = "Odyssey|DB")
 	TArray<FOdysseyBuilding> GetBuildings(int32 InvestmentId);
  
@@ -41,8 +41,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Odyssey|DB")
 	TArray<FOdysseyFlat> GetFlats(int32 BuildingId);
- 
-	/** Slownik statusow (id -> status). Czytany raz i cache'owany. */
+	
 	UFUNCTION(BlueprintCallable, Category = "Odyssey|DB")
 	bool GetStatus(int32 StatusId, FOdysseyFlatStatus& OutStatus);
 	

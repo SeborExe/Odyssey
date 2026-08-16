@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widget/OdysseyFlatDetailsWidget.h"
 
 #include "Components/TextBlock.h"
@@ -34,16 +33,14 @@ void UOdysseyFlatDetailsWidget::SetFlat(const FOdysseyFlat& Flat)
  
 	if (RoomsAreaText)
 	{
-		const FString S = FString::Printf(TEXT("%d %s \u00B7 %s m\u00B2"),
-			Flat.NumRooms, *RoomsWord(Flat.NumRooms), *FormatArea(Flat.Area));
+		const FString S = FString::Printf(TEXT("%d %s \u00B7 %s m\u00B2"), Flat.NumRooms, *RoomsWord(Flat.NumRooms), *FormatArea(Flat.Area));
 		RoomsAreaText->SetText(FText::FromString(S));
 	}
  
 	if (PriceText)
 	{
-		PriceText->SetText(FText::FromString(
-			Flat.bHasPrice ? FormatGroszeToPln(Flat.PriceGrosze) + TEXT(" z\u0142")
-						   : TEXT("Cena na zapytanie")));
+		// Docelowo nie powinno byc TEXT tylko wskazanie do wpisu w ST (stringTable), gdzie będzie tłumaczenie 
+		PriceText->SetText(FText::FromString(Flat.bHasPrice ? FormatGroszeToPln(Flat.PriceGrosze) + TEXT(" z\u0142" : TEXT("Cena na zapytanie"))));
 	}
  
 	if (PriceSqmText)
@@ -64,8 +61,7 @@ void UOdysseyFlatDetailsWidget::SetFlat(const FOdysseyFlat& Flat)
 		TArray<FString> Lines;
 		for (const FOdysseyExtra& E : Flat.Extras)
 		{
-			Lines.Add(E.Note.IsNone() ? E.Name.ToString()
-									   : FString::Printf(TEXT("%s \u2014 %s"), *E.Name.ToString(), *E.Note.ToString()));
+			Lines.Add(E.Note.IsNone() ? E.Name.ToString() : FString::Printf(TEXT("%s \u2014 %s"), *E.Name.ToString(), *E.Note.ToString()));
 		}
 		
 		ExtrasText->SetText(FText::FromString(FString::Join(Lines, TEXT("\n"))));
@@ -87,8 +83,7 @@ FString UOdysseyFlatDetailsWidget::FormatGroszeToPln(int64 Grosze)
 	const int32 Gr  = static_cast<int32>(Abs % 100);
  
 	const FString ZlStr = FString::Printf(TEXT("%lld"), Zl);
- 
-	// Grupowanie czesci calkowitej spacjami co 3 cyfry.
+	
 	FString Grouped;
 	int32 Count = 0;
 	for (int32 i = ZlStr.Len() - 1; i >= 0; --i)
@@ -123,5 +118,6 @@ FString UOdysseyFlatDetailsWidget::RoomsWord(int32 NumRooms)
 	{
 		return TEXT("pokoje");
 	}
+	
 	return TEXT("pokoi");
 }

@@ -18,8 +18,7 @@ class ODYSSEYCREW_API UOdysseyInvestmentSelectWidget : public UUserWidget
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Odyssey")
 	FOnInvestmentChosen OnInvestmentChosen;
- 
-	/** Pobiera aktywne inwestycje i buduje przyciski. */
+	
 	UFUNCTION(BlueprintCallable, Category = "Odyssey")
 	void Refresh();
  
@@ -31,12 +30,10 @@ public:
  
 protected:
 	virtual void NativeConstruct() override;
- 
-	// Kontener na pozycje listy (VerticalBox / ScrollBox w WBP).
+	
 	UPROPERTY(meta = (BindWidget))
 	UPanelWidget* ListContainer = nullptr;
- 
-	// Klasa pozycji (WBP oparty na UOdysseyInvestmentEntryWidget).
+	
 	UPROPERTY(EditAnywhere, Category = "Odyssey")
 	TSubclassOf<UOdysseyInvestmentEntryWidget> EntryWidgetClass;
  

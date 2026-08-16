@@ -6,11 +6,13 @@
 #include "GameFramework/PlayerController.h"
 #include "OdysseyPlayerController.generated.h"
 
+struct FInputActionValue;
 class UOdysseyChangeBuildingWidget;
 class AOdysseyHUD;
 class AOdysseyBuildingsActor;
 class UOdysseyFlatDetailsWidget;
 class UOdysseyInvestmentSelectWidget;
+class UInputAction;
 
 UCLASS(Blueprintable, BlueprintType)
 class ODYSSEYCREW_API AOdysseyPlayerController : public APlayerController
@@ -27,7 +29,7 @@ protected:
 	virtual void Tick( float DeltaTime ) override;
 	virtual void SetupInputComponent() override;
  
-	void HandlePrimaryPress();
+	void HandlePrimaryPress(const FInputActionValue& Value);
 	void HandleTouchPress(ETouchIndex::Type FingerIndex, FVector Location);
  
 	UFUNCTION()
@@ -35,6 +37,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Odyssey")
 	TSubclassOf<UOdysseyFlatDetailsWidget> DetailsWidgetClass;
+	
+	//Inputs
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<UInputAction> IA_PrimaryPress;
  
 private:
 	
@@ -54,11 +60,17 @@ private:
 	UFUNCTION()
 	void HandleChangeBuilding(bool bNext);
 	
+	void LoadBuildings();
+	UFUNCTION()
+	void OnBuildingsLoaded();
+	UFUNCTION()
+	void BindToBuildings(AOdysseyBuildingsActor* Loaded);
+	
 	UPROPERTY()
 	TWeakObjectPtr<AOdysseyHUD> OdysseyHUD;
  
-	UPROPERTY() 
-	TObjectPtr<AOdysseyBuildingsActor> Buildings = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category="Odyssey") 
+	TSoftObjectPtr<AOdysseyBuildingsActor> Buildings = nullptr;
 	UPROPERTY() 
 	TObjectPtr<UOdysseyFlatDetailsWidget> DetailsWidget = nullptr;
 	

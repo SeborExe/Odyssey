@@ -6,16 +6,3 @@ AOdysseyPawn::AOdysseyPawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
-
-void AOdysseyPawn::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void AOdysseyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-

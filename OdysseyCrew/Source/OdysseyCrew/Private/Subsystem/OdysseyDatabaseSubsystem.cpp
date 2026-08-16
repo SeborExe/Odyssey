@@ -30,7 +30,7 @@ bool UOdysseyDatabaseSubsystem::OpenDatabase(const FString& AbsolutePath)
 	
 	Db = MakeUnique<FSQLiteDatabase>();
 	
-	// READ-ONLY: nic nie zapisujemy, plik nie zostanie zablokowany do zapisu.
+	// READ-ONLY: nic nie zapisujemy, plik nie zostanie zablokowany do zapisu
 	if (!Db->Open(*AbsolutePath, ESQLiteDatabaseOpenMode::ReadOnly))
 	{
 		UE_LOG(LogTemp, Error, TEXT("[Odyssey] Nie udalo sie otworzyc bazy: %s"), *AbsolutePath);
@@ -92,7 +92,7 @@ TArray<FOdysseyBuilding> UOdysseyDatabaseSubsystem::GetBuildings(int32 Investmen
 		return Result;
 	}
  
-	// JOIN na investments, zeby nie pokazac budynkow ukrytej inwestycji.
+	// JOIN na investments, zeby nie pokazac budynkow ukrytej inwestycji
 	FSQLitePreparedStatement Stmt;
 	Stmt.Create(*Db, TEXT(
 		"SELECT b.id, b.investment_id, b.name, b.code, b.floors_count, b.order_number "
@@ -127,8 +127,8 @@ TArray<FOdysseyFlat> UOdysseyDatabaseSubsystem::GetFlats(int32 BuildingId)
         return Result;
     }
  
-    // Kaskada widocznosci: flat + building + investment musza byc active = 1.
-    // Dzieki temu mieszkania z ukrytego Budynku E nie przejda, mimo ze same maja active = 1.
+    // Kaskada widocznosci: flat + building + investment musza byc active = 1
+    // Dzieki temu mieszkania z ukrytego Budynku E nie przejda, mimo ze same maja active = 1
     FSQLitePreparedStatement Stmt;
     Stmt.Create(*Db, TEXT(
         "SELECT f.id, f.building_id, f.status_id, f.name, f.entry_floor, f.floor, "
@@ -156,9 +156,7 @@ TArray<FOdysseyFlat> UOdysseyDatabaseSubsystem::GetFlats(int32 BuildingId)
         double AreaTmp = 0.0;
         Stmt.GetColumnValueByName(TEXT("area"), AreaTmp);
         F.Area = static_cast<float>(AreaTmp);
- 
-        // price / price_sqm moga byc NULL rozrozniamy NULL od 0 po TYPIE kolumny.
-        // GetColumnTypeByName zwraca bool, a typ oddaje przez parametr wyjsciowy.
+    	
         ESQLiteColumnType PriceType = ESQLiteColumnType::Null;
         Stmt.GetColumnTypeByName(TEXT("price"), PriceType);
         if (PriceType != ESQLiteColumnType::Null)
@@ -167,8 +165,7 @@ TArray<FOdysseyFlat> UOdysseyDatabaseSubsystem::GetFlats(int32 BuildingId)
             Stmt.GetColumnValueByName(TEXT("price"),     F.PriceGrosze);
             Stmt.GetColumnValueByName(TEXT("price_sqm"), F.PriceSqmGrosze);
         }
- 
-        // mesh_id moze byc NULL.
+    	
         ESQLiteColumnType MeshType = ESQLiteColumnType::Null;
         Stmt.GetColumnTypeByName(TEXT("mesh_id"), MeshType);
         if (MeshType != ESQLiteColumnType::Null)
@@ -196,6 +193,7 @@ bool UOdysseyDatabaseSubsystem::GetStatus(int32 StatusId, FOdysseyFlatStatus& Ou
 		OutStatus = *Found;
 		return true;
 	}
+	
 	return false;
 }
 

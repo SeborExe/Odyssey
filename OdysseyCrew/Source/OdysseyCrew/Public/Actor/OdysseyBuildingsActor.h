@@ -19,36 +19,42 @@ class ODYSSEYCREW_API AOdysseyBuildingsActor : public AActor
 
 	public:
     AOdysseyBuildingsActor();
- 
-    /** Ktora inwestycja. Na razie z edytora UI wyboru w kolejnym kroku. */
+    
+    // ID inwestycji
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Odyssey")
     int32 InvestmentId = 1;
  
-    /** Material czytajacy PerInstanceCustomData (0..2 = RGB, 3 = highlight). */
+    // Material czytajacy PerInstanceCustomData (0,1,2 = RGB, 3 = highlight)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Odyssey")
-    UMaterialInterface* FlatMaterial = nullptr;
+    TObjectPtr<UMaterialInterface> FlatMaterial = nullptr;
  
-    // --- wymiary bryl, w jednostkach UE (cm) ---
-    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") float StoreyHeight = 300.f;
-    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") float FlatDepth    = 400.f;
-    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") float FlatGap      = 40.f;
-    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") float BuildingGap  = 800.f;
-    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") float WidthPerSqm  = 7.f;
-    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") float MinFlatWidth = 180.f;
-    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") float MaxFlatWidth = 900.f;
+    // Wymiary bryl
+    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") 
+    float StoreyHeight = 300.f;
+    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") 
+    float FlatDepth    = 400.f;
+    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") 
+    float FlatGap      = 40.f;
+    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") 
+    float BuildingGap  = 800.f;
+    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") 
+    float WidthPerSqm  = 7.f;
+    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") 
+    float MinFlatWidth = 180.f;
+    UPROPERTY(EditAnywhere, Category = "Odyssey|Layout") 
+    float MaxFlatWidth = 900.f;
  
-    /** Klikniecie mieszkania -> panel szczegolow (podepniemy w kolejnym kroku). */
+    // Klikniecie mieszkania
     UPROPERTY(BlueprintAssignable, Category = "Odyssey")
     FOnFlatSelected OnFlatSelected;
- 
-    /** Wolane po trace: true + broadcast, jesli instancja to mieszkanie. */
+    
     UFUNCTION(BlueprintCallable, Category = "Odyssey")
     bool SelectByInstanceIndex(int32 InstanceIndex);
  
     UFUNCTION(BlueprintCallable, Category = "Odyssey")
     void ClearSelection();
  
-    /** Przebudowa geometrii (np. po zmianie InvestmentId). */
+    // Przebudowa geometrii (np. po zmianie InvestmentId)
     UFUNCTION(BlueprintCallable, Category = "Odyssey")
     void Rebuild();
     
@@ -65,8 +71,7 @@ private:
  
     UPROPERTY(VisibleAnywhere, Category = "Odyssey")
     UInstancedStaticMeshComponent* Flats = nullptr;
- 
-    /** instancja ISM -> mieszkanie (indeksy zgodne). */
+    
     UPROPERTY()
     TArray<FOdysseyFlat> InstanceFlats;
     TArray<FBox> BuildingLocalBounds; 
